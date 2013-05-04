@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>tic-tac-toe</title>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<p>Hello</p>
+		<script>
+			var socket = io.connect();
+			socket.on("anevent", function(data) {
+				console.log("data: " + data);
+			});
+		</script>
+	</body>
+</html>

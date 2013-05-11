@@ -2,16 +2,9 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>tic-tac-toe</title>
-		<script src="/socket.io/socket.io.js"></script>
+		<title>Tic Tac Toe</title>
+		<script data-main="js/main" src="js/lib/require-2.1.5.js"></script>
 	</head>
-	<body>
-		<p>Hello</p>
-		<script>
-			var socket = io.connect();
-			socket.on("anevent", function(data) {
-				console.log("data: " + data);
-			});
-		</script>
+	<body id="app-view">
 	</body>
 </html>

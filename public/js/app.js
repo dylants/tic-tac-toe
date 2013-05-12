@@ -2,13 +2,13 @@
 /*global define:true */
 define([
 	"jquery",
-	"app-view"
+	"board-view"
 ],
-function($, AppView) {
+function($, BoardView) {
 	"use-strict";
 
 	$(function() {
-		var appView = new AppView();
-		appView.render();
+		var boardView = new BoardView();
+		boardView.render();
 	});
 });

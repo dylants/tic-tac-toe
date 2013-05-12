@@ -5,7 +5,9 @@ require.config({
 		"backbone": "lib/backbone-0.9.10",
 		"jquery": "lib/jquery-1.9.1",
 		"text": "lib/text-2.0.5",
-		"app-view": "views/app-view",
+		"space-model": "models/space-model",
+		"space-view": "views/space-view",
+		"board-view": "views/board-view",
 		"app": "app"
 	},
 	shim: {

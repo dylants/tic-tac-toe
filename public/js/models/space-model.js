@@ -9,7 +9,7 @@ function (Backbone) {
 	return Backbone.Model.extend({
 
 		defaults: {
-			owner: "_"
+			owner: ""
 		}
 	});
 });

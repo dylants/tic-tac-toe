@@ -1,10 +1,20 @@
-table {
+#board-view {
+	background: rgb(50, 50, 50);
+	font-family: 'Alegreya SC', serif;
+	h1 {
+		text-align: center;
+		color: rgb(200, 200, 200);
+	}
+}
+
+#ttt-table {
 	border-collapse: collapse;
+	margin: 0 auto;
+	background: rgb(90, 90, 90);
 	td {
-		border: 1px solid black;
-		.space-view {
-			padding: 10px;
-		}
+		-webkit-transition: border .8s ease-in-out;
+		-moz-transition: border .8s ease-in-out;
+		transition: border .8s ease-in-out;
 	}
 	tr:first-child td {
 		border-top: 0;
@@ -18,4 +28,16 @@ table {
 	tr td:last-child {
 		border-right: 0;
 	}
+}
+
+.border-lines {
+	border: 5px solid black;
+}
+
+.space-view {
+	width: 1.5em;
+	height: 1.5em;
+	text-align: center;
+	font-size: 4em;
+	color: rgb(200, 200, 200);
 }

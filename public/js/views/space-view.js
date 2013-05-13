@@ -4,9 +4,10 @@ define([
 	"backbone",
 	"underscore",
 	"jquery",
+	"socketio",
 	"text!../../templates/space.html"
 ],
-function (Backbone, _, $, spaceHtml) {
+function (Backbone, _, $, socketio, spaceHtml) {
 	"use strict";
 
 	return Backbone.View.extend({
@@ -28,10 +29,16 @@ function (Backbone, _, $, spaceHtml) {
 		},
 
 		claimSpace: function() {
+			var socket = socketio.connect();
+			socket.emit("clicked", {spaceID: this.model.get("spaceID")});
+
 			// temporary...
-			console.log("space claimed!");
-			this.model.set("owner", "X");
-			this.render();
+			var that = this;
+			socket.on("space_claimed", function(data) {
+				console.log("space claimed!");
+				that.model.set("owner", data.XorO);
+				that.render();
+			});
 		}
 	});
 });

@@ -12,6 +12,8 @@ define([
 function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 	"use strict";
 
+	var spaceModels = {};
+
 	return Backbone.View.extend({
 
 		el: "#board-view",
@@ -20,8 +22,11 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 
 		initialize: function() {
 			var socket = socketio.connect();
-			socket.on("anevent", function(data) {
-				console.log("data: " + data);
+
+			socket.on("space_claimed", function(data) {
+				console.log("space claimed!");
+				var model = spaceModels[data.spaceID];
+				model.set("owner", data.XorO);
 			});
 		},
 
@@ -50,6 +55,11 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 			// each space on the board has a model associated,
 			// which contains the data on that specific space
 			var spaceModel = new SpaceModel({spaceID: spaceID});
+
+			// store the space model away for later
+			spaceModels[spaceID] = spaceModel;
+
+			// create and render the view, appending it to the row
 			var spaceView = new SpaceView({model: spaceModel});
 			rowSelector.append(spaceView.render().el);
 		}

@@ -21,6 +21,7 @@ function (Backbone, _, $, socketio, spaceHtml) {
 		},
 
 		initialize: function() {
+			this.model.on( "change", this.render, this );
 		},
 
 		render: function() {
@@ -31,14 +32,6 @@ function (Backbone, _, $, socketio, spaceHtml) {
 		claimSpace: function() {
 			var socket = socketio.connect();
 			socket.emit("clicked", {spaceID: this.model.get("spaceID")});
-
-			// temporary...
-			var that = this;
-			socket.on("space_claimed", function(data) {
-				console.log("space claimed!");
-				that.model.set("owner", data.XorO);
-				that.render();
-			});
 		}
 	});
 });

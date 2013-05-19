@@ -17,6 +17,6 @@ function($, BoardView) {
 		setTimeout(function() {
 			// add our border lines animation
 			$("td").addClass("border-lines");
-		}, 100);
+		}, 200);
 	});
 });

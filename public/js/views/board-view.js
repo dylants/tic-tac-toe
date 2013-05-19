@@ -26,7 +26,7 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 			socket.on("space_claimed", function(data) {
 				console.log("space claimed!");
 				var model = spaceModels[data.spaceID];
-				model.set("owner", data.XorO);
+				model.set("owner", data.xo);
 			});
 		},
 

@@ -21,7 +21,16 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 		template: _.template(boardHtml),
 
 		initialize: function() {
+			var that = this;
 			var socket = socketio.connect();
+
+			socket.on("player_id", function(data) {
+				console.log("player_id");
+				console.log("data: " + data);
+				that.model.set("playerNumber", data.playerNumber);
+				that.model.set("playerXO", data.playerXO);
+				that.render();
+			});
 
 			socket.on("space_claimed", function(data) {
 				console.log("space claimed!");
@@ -32,7 +41,7 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 
 		render: function() {
 			// first render the tic tac toe board
-			this.$el.html(this.template());
+			this.$el.html(this.template(this.model.toJSON()));
 
 			// then render each row
 			this.renderRow(1, "#ttt-row-1");

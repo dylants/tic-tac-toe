@@ -21,9 +21,17 @@ module.exports = function(app, server) {
 		if (!game.player1) {
 			game.player1 = socket.id;
 			console.log("game.player1: " + game.player1);
+			io.sockets.socket(game.player1).emit("player_id", {
+				playerNumber: 1,
+				playerXO: "X"
+			});
 		} else {
 			game.player2 = socket.id;
 			console.log("game.player2: " + game.player2);
+			io.sockets.socket(game.player2).emit("player_id", {
+				playerNumber: 2,
+				playerXO: "O"
+			});
 		}
 
 		socket.on("clicked", function(data) {

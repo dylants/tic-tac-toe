@@ -2,14 +2,16 @@
 /*global define:true */
 define([
 	"jquery",
+	"board-model",
 	"board-view"
 ],
-function($, BoardView) {
+function($, BoardModel, BoardView) {
 	"use-strict";
 
 	$(function() {
 		// render the game board
-		var boardView = new BoardView();
+		var boardModel = new BoardModel();
+		var boardView = new BoardView({model: boardModel});
 		boardView.render();
 
 		// the timeout here is to delay adding the class until we've rendered

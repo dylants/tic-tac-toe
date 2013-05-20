@@ -84,7 +84,13 @@ TicTacToe.prototype.findGameForPlayerID = function(playerID) {
 	return null;
 };
 
+/**
+ * Ends the current player's turn in the supplied game
+ * 
+ * @param  {object} game The current game
+ */
 TicTacToe.prototype.endTurn = function(game) {
+	// Set the current player's turn to the other player
 	if (game.playerTurn === 1) {
 		game.playerTurn = 2;
 	} else {

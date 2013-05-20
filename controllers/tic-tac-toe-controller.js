@@ -1,27 +1,13 @@
 var socketio = require("socket.io");
+var ticTacToe = require("../tic-tac-toe-game.js");
 
 module.exports = function(app, server) {
-	var io, gameData;
-
-	gameData = {};
-	gameData.games = [];
-	// for now hard code only 1 game
-	var game = {};
-	game.player1 = {};
-	game.player1.id = null;
-	game.player1.xo = "X";
-	game.player1.number = 1;
-	game.player2 = {};
-	game.player2.id = null;
-	game.player2.xo = "O";
-	game.player2.number = 2;
-	game.playerTurn = game.player1.number;
-	gameData.games.push(game);
+	var io;
 
 	io = socketio.listen(server);
 	io.sockets.on("connection", function(socket) {
-		// for now hard code only 1 game
-		var game = gameData.games[0];
+		// retrieve a tic-tac-toe game to use
+		var game = ticTacToe.findAvailableGame();
 
 		// if player 1 is available, use it, else player 2
 		if (!game.player1.id) {
@@ -45,8 +31,7 @@ module.exports = function(app, server) {
 			console.log(socket.id);
 			console.log(data);
 
-			// for now hard code only 1 game
-			game = gameData.games[0];
+			game = ticTacToe.findGameForPlayerID(socket.id);
 
 			// who's turn is it?
 			player = socket.id === game.player1.id ? game.player1 : game.player2;
@@ -69,11 +54,7 @@ module.exports = function(app, server) {
 				xo: player.xo
 			});
 
-			if (game.playerTurn === 1) {
-				game.playerTurn = 2;
-			} else {
-				game.playerTurn = 1;
-			}
+			ticTacToe.endTurn(game);
 		});
 	});
 

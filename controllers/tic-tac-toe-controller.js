@@ -33,12 +33,8 @@ module.exports = function(app, server) {
 
 			game = ticTacToe.findGameForPlayerID(socket.id);
 
-			// who's turn is it?
-			player = socket.id === game.player1.id ? game.player1 : game.player2;
-
-			// verify it's a valid turn
-			if (game.playerTurn !== player.number) {
-				console.log("not your turn!");
+			// is this a valid move?
+			if (!ticTacToe.moveRequest(game, socket.id, data.spaceID)) {
 				return;
 			}
 
@@ -47,11 +43,11 @@ module.exports = function(app, server) {
 
 			io.sockets.socket(game.player1.id).emit("space_claimed", {
 				spaceID: data.spaceID,
-				xo: player.xo
+				xo: game.currentPlayer.xo
 			});
 			io.sockets.socket(game.player2.id).emit("space_claimed", {
 				spaceID: data.spaceID,
-				xo: player.xo
+				xo: game.currentPlayer.xo
 			});
 
 			ticTacToe.endTurn(game);

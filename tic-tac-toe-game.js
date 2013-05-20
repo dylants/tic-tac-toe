@@ -26,7 +26,9 @@ TicTacToe.prototype.createGame = function() {
 	game.player2.id = null;
 	game.player2.xo = "O";
 	game.player2.number = 2;
-	game.playerTurn = game.player1.number;
+
+	game.currentPlayer = game.player1;
+	game.board = {};
 
 	// add our game to our list of games
 	this.gameData.games.push(game);
@@ -84,17 +86,42 @@ TicTacToe.prototype.findGameForPlayerID = function(playerID) {
 	return null;
 };
 
+TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
+	var player;
+
+	// who's requested this move?
+	player = playerID === game.player1.id ? game.player1 : game.player2;
+
+	// verify it's a valid turn
+	if (game.currentPlayer.id !== player.id) {
+		console.log("not your turn!");
+		return false;
+	}
+
+	// if the space is available on the game board, allow the move
+	if (!game.board[spaceID]) {
+		game.board[spaceID] = player.xo;
+		// return true to signify move was valid
+		console.log("valid move");
+		return true;
+	} else {
+		// the space is already taken, return false
+		console.log("space is taken!");
+		return false;
+	}
+};
+
 /**
  * Ends the current player's turn in the supplied game
  * 
  * @param  {object} game The current game
  */
 TicTacToe.prototype.endTurn = function(game) {
-	// Set the current player's turn to the other player
-	if (game.playerTurn === 1) {
-		game.playerTurn = 2;
+	// Set the current player to the other player
+	if (game.currentPlayer.id === game.player1.id) {
+		game.currentPlayer = game.player2;
 	} else {
-		game.playerTurn = 1;
+		game.currentPlayer = game.player1;
 	}
 };
 

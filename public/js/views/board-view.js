@@ -32,6 +32,11 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 				that.render();
 			});
 
+			socket.on("ready_to_play", function() {
+				// add our border lines animation
+				$("td").addClass("border-lines");
+			});
+
 			socket.on("space_claimed", function(data) {
 				console.log("space claimed!");
 				var model = spaceModels[data.spaceID];
@@ -47,6 +52,19 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 				for (i=0; i<winner.combination.length; i++) {
 					$("#" + winner.combination[i]).addClass("winner");
 				}
+			});
+
+			socket.on("waiting_for_player", function() {
+				var key, model;
+
+				// loop through the space models and remove owners
+				for (key in spaceModels) {
+					model = spaceModels[key];
+					model.set("owner", "");
+				}
+
+				// remove the border lines animation
+				$("td").removeClass("border-lines");
 			});
 		},
 

@@ -35,8 +35,40 @@ TicTacToe.prototype.createGame = function() {
 	// add our game to our list of games
 	this.gameData.games.push(game);
 
-	// return it to allow other to play
+	// return it to allow others to play
 	return game;
+};
+
+/**
+ * Resets the game to a new game with a clear game board.
+ * 
+ * @param  {Object} game The current game
+ * @return {Object}      The game, reset
+ */
+TicTacToe.prototype.newGame = function(game) {
+	// reset the game, then return it back
+	game.currentPlayer = game.player1;
+	game.board = {};
+
+	return game;
+};
+
+/**
+ * Removes a player from the game, and resets the game
+ * @param  {Object} game     The current game
+ * @param  {String} playerID The ID of the player to remove
+ * @return {Object}          The game, with the player removed and game reset
+ */
+TicTacToe.prototype.removePlayerFromGame = function(game, playerID) {
+	// find which player to remove, and clear the ID
+	if (game.player1.id === playerID) {
+		game.player1.id = null;
+	} else {
+		game.player2.id = null;
+	}
+
+	// return a new game
+	return this.newGame(game);
 };
 
 /**
@@ -47,7 +79,7 @@ TicTacToe.prototype.createGame = function() {
  * @return {Object} A tic-tac-toe game which has an open slot to play
  */
 TicTacToe.prototype.findAvailableGame = function() {
-	var game;
+	var i, game;
 
 	// first see if there are any existing games
 	if (this.gameData.games.length === 0) {
@@ -56,11 +88,12 @@ TicTacToe.prototype.findAvailableGame = function() {
 	}
 
 	// okay, so there's already some games going on...
-	// let's see if the last one has an open slot
-	game = this.gameData.games[this.gameData.games.length - 1];
-	if (game.player2.id === null) {
-		// it does!  Let's use this one
-		return game;
+	// let's loop through them and try to find one with an empty slot
+	for (i=0; i<this.gameData.games.length; i++) {
+		game = this.gameData.games[i];
+		if ((game.player1.id === null) || (game.player2.id === null)) {
+			return game;
+		}
 	}
 
 	// so we have games but they're all full, let's return a new one!

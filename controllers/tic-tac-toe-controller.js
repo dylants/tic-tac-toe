@@ -26,6 +26,12 @@ module.exports = function(app, server) {
 			});
 		}
 
+		// if both players exist, we can play!
+		if (game.player1.id && game.player2.id) {
+			io.sockets.socket(game.player1.id).emit("ready_to_play");
+			io.sockets.socket(game.player2.id).emit("ready_to_play");
+		}
+
 		// called when a client clicks one of the spaces on the game board
 		socket.on("clicked", function(data) {
 			var player, game, winner;
@@ -59,6 +65,25 @@ module.exports = function(app, server) {
 				io.sockets.socket(game.player2.id).emit("winner", {
 					winner: winner
 				});
+			}
+		});
+
+		socket.on("disconnect", function() {
+			var game;
+			console.log(socket.id);
+
+			// get the game for this client
+			game = ticTacToe.findGameForPlayerID(socket.id);
+
+			// remove the player from the game
+			game = ticTacToe.removePlayerFromGame(game, socket.id);
+
+			// inform the other player (if exists) that the game has reset
+			if (game.player1.id !== null) {
+				io.sockets.socket(game.player1.id).emit("waiting_for_player");
+			}
+			if (game.player2.id !== null) {
+				io.sockets.socket(game.player2.id).emit("waiting_for_player");
 			}
 		});
 	});

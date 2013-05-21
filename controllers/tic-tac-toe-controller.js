@@ -26,11 +26,12 @@ module.exports = function(app, server) {
 			});
 		}
 
+		// called when a client clicks one of the spaces on the game board
 		socket.on("clicked", function(data) {
 			var player, game;
 			console.log(socket.id);
-			console.log(data);
 
+			// get the game for this client
 			game = ticTacToe.findGameForPlayerID(socket.id);
 
 			// is this a valid move?
@@ -38,9 +39,7 @@ module.exports = function(app, server) {
 				return;
 			}
 
-			console.log("sending space_claimed to player1: " + game.player1 +
-				" and player2: " + game.player2);
-
+			// it's a valid move, so let's inform the clients
 			io.sockets.socket(game.player1.id).emit("space_claimed", {
 				spaceID: data.spaceID,
 				xo: game.currentPlayer.xo
@@ -50,6 +49,7 @@ module.exports = function(app, server) {
 				xo: game.currentPlayer.xo
 			});
 
+			// and end the turn
 			ticTacToe.endTurn(game);
 		});
 	});

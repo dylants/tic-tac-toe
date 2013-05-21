@@ -1,3 +1,5 @@
+var _ = require("underscore");
+
 /**
  * This is hosts the main logic for our Tic-Tac-Toe game
  */
@@ -13,7 +15,7 @@ function TicTacToe() {
  * and player 2 the "O"s.  We also set player 1 as the first player to make
  * a move.  This game is then added to our list of games, and returned.
  *
- * @return {object} A brand new tic-tac-toe game
+ * @return {Object} A brand new tic-tac-toe game
  */
 TicTacToe.prototype.createGame = function() {
 	// create the game data
@@ -42,7 +44,7 @@ TicTacToe.prototype.createGame = function() {
  * players playing it) and returns this game.  This might be a game which
  * already has one player playing, or a brand new game.
  * 
- * @return {object} A tic-tac-toe game which has an open slot to play
+ * @return {Object} A tic-tac-toe game which has an open slot to play
  */
 TicTacToe.prototype.findAvailableGame = function() {
 	var game;
@@ -68,8 +70,8 @@ TicTacToe.prototype.findAvailableGame = function() {
 /**
  * Finds an existing game that has a player who has the playerID
  * 
- * @param  {string} playerID The ID of the player
- * @return {object}          An existing tic-tac-toe game
+ * @param  {String} playerID The ID of the player
+ * @return {Object}          An existing tic-tac-toe game
  */
 TicTacToe.prototype.findGameForPlayerID = function(playerID) {
 	var game, i;
@@ -86,6 +88,15 @@ TicTacToe.prototype.findGameForPlayerID = function(playerID) {
 	return null;
 };
 
+/**
+ * Determines if a move is valid for the given player.  Returns true
+ * if the move is valid, false otherwise.
+ * 
+ * @param  {Object} game     The current game
+ * @param  {String} playerID The ID of the player requesting to move
+ * @param  {String} spaceID  The ID of the space requested
+ * @return {Boolean}         True if the move is valid, false otherwise
+ */
 TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 	var player;
 
@@ -101,8 +112,8 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 	// if the space is available on the game board, allow the move
 	if (!game.board[spaceID]) {
 		game.board[spaceID] = player.xo;
-		// return true to signify move was valid
 		console.log("valid move");
+		// return true to signify move was valid
 		return true;
 	} else {
 		// the space is already taken, return false
@@ -114,15 +125,84 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 /**
  * Ends the current player's turn in the supplied game
  * 
- * @param  {object} game The current game
+ * @param  {Object} game The current game
  */
 TicTacToe.prototype.endTurn = function(game) {
-	// Set the current player to the other player
-	if (game.currentPlayer.id === game.player1.id) {
-		game.currentPlayer = game.player2;
+	var winner;
+
+	// check to see if there is a winner
+	winner = didSomeoneWin(game);
+	if (winner) {
+		console.log(winner + " WON!!!");
 	} else {
-		game.currentPlayer = game.player1;
+		// Set the current player to the other player
+		if (game.currentPlayer.id === game.player1.id) {
+			game.currentPlayer = game.player2;
+		} else {
+			game.currentPlayer = game.player1;
+		}
 	}
+};
+
+/**
+ * A list of combinations on the game board that, if filled,
+ * would win a game of tic-tac-toe.
+ * 
+ * @type {Array}
+ */
+var WINNING_COMBINATIONS = [
+	["1-1", "1-2", "1-3"],
+	["2-1", "2-2", "2-3"],
+	["3-1", "3-2", "3-3"],
+	["1-1", "2-1", "3-1"],
+	["1-2", "2-2", "3-2"],
+	["1-3", "2-3", "3-3"],
+	["1-1", "2-2", "3-3"],
+	["1-3", "2-2", "3-1"]
+];
+
+/**
+ * Checks if there is a winner in the current game, and if so,
+ * returns the winning player's symbol (X or O).
+ * 
+ * @param  {Object} game The current game
+ * @return {String}      The winner (X or O) or null if no winners
+ */
+var didSomeoneWin = function(game) {
+	var board, boardKeys, intersected, i, possibleWinningCombos, winningCombo;
+
+	board = game.board;
+	boardKeys = _.keys(board);
+	possibleWinningCombos = [];
+
+	// loop through all the winning combinations
+	for (i=0; i<WINNING_COMBINATIONS.length; i++) {
+		// run an intersection between those winning combinations and
+		// the places played on the game board at this point
+		intersected = _.intersection(boardKeys, WINNING_COMBINATIONS[i]);
+		// if that combination exists on the game board...
+		if (intersected.length === 3) {
+			// ...then add it to a possible winning list
+			possibleWinningCombos.push(WINNING_COMBINATIONS[i]);
+		}
+	}
+
+	// if any possible winning combinations exist, inspect further...
+	if (possibleWinningCombos.length > 0) {
+		for (i = 0; i < possibleWinningCombos.length; i++) {
+			winningCombo = possibleWinningCombos[i];
+			// check to see if the 3 spots contain the same value
+			// (meaning either all X's or all O's)
+			if ((board[winningCombo[0]] === board[winningCombo[1]]) &&
+				(board[winningCombo[0]] === board[winningCombo[2]])) {
+				// there is a winner! return it
+				return board[winningCombo[0]];
+			}
+		}
+	}
+
+	// if we're here, no winners :(
+	return null;
 };
 
 // Create only one instance of this game and export it

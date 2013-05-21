@@ -5,11 +5,14 @@ define([
 	"backbone",
 	"underscore",
 	"jquery",
-	"space-view",
 	"space-model",
+	"space-view",
+	"win-model",
+	"win-view",
 	"text!../../templates/board.html"
 ],
-function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
+function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
+	WinView, boardHtml) {
 	"use strict";
 
 	var spaceModels = {};
@@ -52,6 +55,9 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 				for (i=0; i<winner.combination.length; i++) {
 					$("#" + winner.combination[i]).addClass("winner");
 				}
+				var winModel = new WinModel({winXO: winner.symbol});
+				var winView = new WinView({model: winModel});
+				that.$el.append(winView.render().el);
 			});
 
 			socket.on("waiting_for_player", function() {

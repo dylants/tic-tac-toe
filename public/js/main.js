@@ -7,6 +7,8 @@ require.config({
 		"text": "lib/text-2.0.5",
 		"space-model": "models/space-model",
 		"space-view": "views/space-view",
+		"win-model": "models/win-model",
+		"win-view": "views/win-view",
 		"board-model": "models/board-model",
 		"board-view": "views/board-view",
 		"app": "app"

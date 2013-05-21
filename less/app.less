@@ -48,6 +48,7 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	// transitions
 	-webkit-transition: color .2s;
 	-moz-transition: color .2s;
 	transition: color .2s;
@@ -55,4 +56,33 @@
 
 .winner {
 	color: rgb(245, 40, 40);
+}
+
+#win-background {
+	visibility: hidden;
+	background-color: rgba(0, 0, 0, 0.8);
+	width: 100%;
+	min-height: 100%;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	text-align: center;
+	#win-modal {
+		background-color: rgb(50, 50, 50);
+		color: rgb(200, 200, 200);
+		margin: 0 auto;
+		width: 15em;
+		margin-top: 10em;
+		padding-bottom: .75em;
+		.win-actions {
+			background-color: rgb(90, 90, 90);
+			border: solid rgb(90, 90, 90);
+			color: rgb(200, 200, 200);
+			&:hover {
+				background-color: rgb(25, 25, 25);
+				border: solid rgb(25, 25, 25);
+			}
+		}
+	}
 }

@@ -9,7 +9,7 @@ app = express();
 server = http.createServer(app);
 
 app.configure(function() {
-	app.set("port", 3000);
+	app.set("port", process.env.VCAP_APP_PORT || 3000);
 	app.set("views", __dirname + "/views");
 	app.engine('html', require('ejs').renderFile);
 	app.use(express.bodyParser());

@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var Player = require("./player");
 
 /**
  * This is hosts the main logic for our Tic-Tac-Toe game
@@ -20,14 +21,8 @@ function TicTacToe() {
 TicTacToe.prototype.createGame = function() {
 	// create the game data
 	var game = {};
-	game.player1 = {};
-	game.player1.id = null;
-	game.player1.xo = "X";
-	game.player1.number = 1;
-	game.player2 = {};
-	game.player2.id = null;
-	game.player2.xo = "O";
-	game.player2.number = 2;
+	game.player1 = new Player(1);
+	game.player2 = new Player(2);
 
 	game.currentPlayer = game.player1;
 	game.board = {};
@@ -55,16 +50,17 @@ TicTacToe.prototype.newGame = function(game) {
 
 /**
  * Removes a player from the game, and resets the game
+ * 
  * @param  {Object} game     The current game
  * @param  {String} playerID The ID of the player to remove
  * @return {Object}          The game, with the player removed and game reset
  */
 TicTacToe.prototype.removePlayerFromGame = function(game, playerID) {
 	// find which player to remove, and clear the ID
-	if (game.player1.id === playerID) {
-		game.player1.id = null;
+	if (game.player1.isMe(playerID)) {
+		game.player1.clear();
 	} else {
-		game.player2.id = null;
+		game.player2.clear();
 	}
 
 	// return a new game
@@ -91,7 +87,7 @@ TicTacToe.prototype.findAvailableGame = function() {
 	// let's loop through them and try to find one with an empty slot
 	for (i=0; i<this.gameData.games.length; i++) {
 		game = this.gameData.games[i];
-		if ((game.player1.id === null) || (game.player2.id === null)) {
+		if (!game.player1.isInUse() || !game.player2.isInUse()) {
 			return game;
 		}
 	}
@@ -112,13 +108,28 @@ TicTacToe.prototype.findGameForPlayerID = function(playerID) {
 	for (i=0; i<this.gameData.games.length; i++) {
 		game = this.gameData.games[i];
 		// if we find a match, return it
-		if ((game.player1.id === playerID) || (game.player2.id === playerID)) {
+		if (game.player1.isMe(playerID) || game.player2.isMe(playerID)) {
 			return game;
 		}
 	}
 
 	// no match? return null
 	return null;
+};
+
+/**
+ * Returns the player in the game that matches the playerID
+ * 
+ * @param  {Object} game     The current game
+ * @param  {String} playerID The ID of the player to match
+ * @return {Object}          The Player who matches the ID
+ */
+TicTacToe.prototype.findPlayerInGame = function(game, playerID) {
+	var player;
+
+	player = game.player1.isMe(playerID) ? game.player1 : game.player2;
+
+	return player;
 };
 
 /**
@@ -134,16 +145,16 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 	var player;
 
 	// who's requested this move?
-	player = playerID === game.player1.id ? game.player1 : game.player2;
+	player = this.findPlayerInGame(game, playerID);
 
 	// verify it's a valid turn
-	if ((game.currentPlayer === null) || (game.currentPlayer.id !== player.id)) {
+	if ((game.currentPlayer === null) || !game.currentPlayer.isMe(player.getID())) {
 		return false;
 	}
 
 	// if the space is available on the game board, allow the move
 	if (!game.board[spaceID]) {
-		game.board[spaceID] = player.xo;
+		game.board[spaceID] = player.getXO();
 		// return true to signify move was valid
 		return true;
 	} else {
@@ -170,11 +181,14 @@ TicTacToe.prototype.endTurn = function(game) {
 		// if there is a winner, set the current player to null to
 		// avoid allowing additional moves
 		game.currentPlayer = null;
+		// both players are not ready to start a game
+		game.player1.setReadyToStartGame(false);
+		game.player2.setReadyToStartGame(false);
 		// return the winner data
 		return winner;
 	} else {
 		// Set the current player to the other player
-		if (game.currentPlayer.id === game.player1.id) {
+		if (game.currentPlayer.isMe(game.player1.getID())) {
 			game.currentPlayer = game.player2;
 		} else {
 			game.currentPlayer = game.player1;

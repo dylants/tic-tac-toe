@@ -23,16 +23,23 @@ function (Backbone, _, $, socketio, winHtml) {
 
 		render: function() {
 			this.$el.html(this.template(this.model.toJSON()));
+
+			// wait to display our win modal for a bit for effect
 			setTimeout(function() {
 				$("#win-background").css("visibility", "visible").
 					hide().fadeIn(500);
-			}, 1500);
+			}, 1200);
+
 			return this;
 		},
 
 		playAgain: function() {
+			// send that we want to play again
 			var socket = socketio.connect();
 			socket.emit("play_again");
+
+			// remove this view
+			this.remove();
 		}
 	});
 });

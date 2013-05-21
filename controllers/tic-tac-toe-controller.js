@@ -10,32 +10,31 @@ module.exports = function(app, server) {
 		var game = ticTacToe.findAvailableGame();
 
 		// if player 1 is available, use it, else player 2
-		if (!game.player1.id) {
-			game.player1.id = socket.id;
-			console.log("game.player1.id: " + game.player1.id);
-			io.sockets.socket(game.player1.id).emit("player_id", {
-				playerNumber: game.player1.number,
-				playerXO: game.player1.xo
+		if (!game.player1.isInUse()) {
+			game.player1.assignID(socket.id);
+			// inform the client
+			io.sockets.socket(socket.id).emit("player_id", {
+				playerNumber: game.player1.getNumber(),
+				playerXO: game.player1.getXO()
 			});
 		} else {
-			game.player2.id = socket.id;
-			console.log("game.player2.id: " + game.player2.id);
-			io.sockets.socket(game.player2.id).emit("player_id", {
-				playerNumber: game.player2.number,
-				playerXO: game.player2.xo
+			game.player2.assignID(socket.id);
+			// inform the client
+			io.sockets.socket(socket.id).emit("player_id", {
+				playerNumber: game.player2.getNumber(),
+				playerXO: game.player2.getXO()
 			});
 		}
 
 		// if both players exist, we can play!
-		if (game.player1.id && game.player2.id) {
-			io.sockets.socket(game.player1.id).emit("ready_to_play");
-			io.sockets.socket(game.player2.id).emit("ready_to_play");
+		if (game.player1.isInUse() && game.player2.isInUse()) {
+			io.sockets.socket(game.player1.getID()).emit("ready_to_play");
+			io.sockets.socket(game.player2.getID()).emit("ready_to_play");
 		}
 
 		// called when a client clicks one of the spaces on the game board
 		socket.on("clicked", function(data) {
 			var player, game, winner;
-			console.log(socket.id);
 
 			// get the game for this client
 			game = ticTacToe.findGameForPlayerID(socket.id);
@@ -46,31 +45,52 @@ module.exports = function(app, server) {
 			}
 
 			// it's a valid move, so let's inform the clients
-			io.sockets.socket(game.player1.id).emit("space_claimed", {
+			io.sockets.socket(game.player1.getID()).emit("space_claimed", {
 				spaceID: data.spaceID,
-				xo: game.currentPlayer.xo
+				xo: game.currentPlayer.getXO()
 			});
-			io.sockets.socket(game.player2.id).emit("space_claimed", {
+			io.sockets.socket(game.player2.getID()).emit("space_claimed", {
 				spaceID: data.spaceID,
-				xo: game.currentPlayer.xo
+				xo: game.currentPlayer.getXO()
 			});
 
 			// end the turn, checking to see if there's a winner
 			winner = ticTacToe.endTurn(game);
 			if (winner) {
 				// if there's a winner, send the info to the clients
-				io.sockets.socket(game.player1.id).emit("winner", {
+				io.sockets.socket(game.player1.getID()).emit("winner", {
 					winner: winner
 				});
-				io.sockets.socket(game.player2.id).emit("winner", {
+				io.sockets.socket(game.player2.getID()).emit("winner", {
 					winner: winner
 				});
 			}
 		});
 
+		socket.on("play_again", function() {
+			var game, player;
+
+			// get the game for this client
+			game = ticTacToe.findGameForPlayerID(socket.id);
+
+			// find the player who said they wanted to play again
+			player = ticTacToe.findPlayerInGame(game, socket.id);
+			// set the player to ready to play
+			player.setReadyToStartGame(true);
+			// signal to the client we're waiting to get the board ready
+			io.sockets.socket(player.getID()).emit("waiting_for_player");
+
+			// create a new game if both players are ready
+			if (game.player1.isReadyToStartGame() && game.player2.isReadyToStartGame()) {
+				game = ticTacToe.newGame(game);
+				// and send the message to the clients
+				io.sockets.socket(game.player1.getID()).emit("ready_to_play");
+				io.sockets.socket(game.player2.getID()).emit("ready_to_play");
+			}
+		});
+
 		socket.on("disconnect", function() {
 			var game;
-			console.log(socket.id);
 
 			// get the game for this client
 			game = ticTacToe.findGameForPlayerID(socket.id);
@@ -79,11 +99,11 @@ module.exports = function(app, server) {
 			game = ticTacToe.removePlayerFromGame(game, socket.id);
 
 			// inform the other player (if exists) that the game has reset
-			if (game.player1.id !== null) {
-				io.sockets.socket(game.player1.id).emit("waiting_for_player");
+			if (game.player1.isInUse()) {
+				io.sockets.socket(game.player1.getID()).emit("waiting_for_player");
 			}
-			if (game.player2.id !== null) {
-				io.sockets.socket(game.player2.id).emit("waiting_for_player");
+			if (game.player2.isInUse()) {
+				io.sockets.socket(game.player2.getID()).emit("waiting_for_player");
 			}
 		});
 	});

@@ -104,7 +104,7 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 	player = playerID === game.player1.id ? game.player1 : game.player2;
 
 	// verify it's a valid turn
-	if (game.currentPlayer.id !== player.id) {
+	if ((game.currentPlayer === null) || (game.currentPlayer.id !== player.id)) {
 		return false;
 	}
 
@@ -134,6 +134,10 @@ TicTacToe.prototype.endTurn = function(game) {
 	// check to see if there is a winner
 	winner = didSomeoneWin(game);
 	if (winner) {
+		// if there is a winner, set the current player to null to
+		// avoid allowing additional moves
+		game.currentPlayer = null;
+		// return the winner data
 		return winner;
 	} else {
 		// Set the current player to the other player

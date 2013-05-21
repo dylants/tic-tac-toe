@@ -37,6 +37,17 @@ function (socketio, Backbone, _, $, SpaceView, SpaceModel, boardHtml) {
 				var model = spaceModels[data.spaceID];
 				model.set("owner", data.xo);
 			});
+
+			socket.on("winner", function(data) {
+				var i, winner;
+
+				winner = data.winner;
+				console.log(winner.symbol + " WON!!");
+				// add the winner class to the spaces that caused the win
+				for (i=0; i<winner.combination.length; i++) {
+					$("#" + winner.combination[i]).addClass("winner");
+				}
+			});
 		},
 
 		render: function() {

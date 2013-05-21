@@ -52,7 +52,13 @@ module.exports = function(app, server) {
 			// end the turn, checking to see if there's a winner
 			winner = ticTacToe.endTurn(game);
 			if (winner) {
-				console.log(winner.symbol + " WON!!!");
+				// if there's a winner, send the info to the clients
+				io.sockets.socket(game.player1.id).emit("winner", {
+					winner: winner
+				});
+				io.sockets.socket(game.player2.id).emit("winner", {
+					winner: winner
+				});
 			}
 		});
 	});

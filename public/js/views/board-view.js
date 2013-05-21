@@ -28,8 +28,6 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
 			var socket = socketio.connect();
 
 			socket.on("player_id", function(data) {
-				console.log("player_id");
-				console.log("data: " + data);
 				that.model.set("playerNumber", data.playerNumber);
 				that.model.set("playerXO", data.playerXO);
 				that.render();
@@ -41,23 +39,28 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
 			});
 
 			socket.on("space_claimed", function(data) {
-				console.log("space claimed!");
 				var model = spaceModels[data.spaceID];
 				model.set("owner", data.xo);
 			});
 
-			socket.on("winner", function(data) {
-				var i, winner;
+			socket.on("end_game", function(data) {
+				var i, winner, winModel, winView;
 
 				winner = data.winner;
-				console.log(winner.symbol + " WON!!");
-				// add the winner class to the spaces that caused the win
-				for (i=0; i<winner.combination.length; i++) {
-					$("#" + winner.combination[i]).addClass("winner");
+				if (winner) {
+					// add the winner class to the spaces that caused the win
+					for (i=0; i<winner.combination.length; i++) {
+						$("#" + winner.combination[i]).addClass("winner");
+					}
+					winModel = new WinModel({winXO: winner.symbol});
+					winView = new WinView({model: winModel});
+					that.$el.append(winView.render().el);
+				} else if (data.stalemate) {
+					// no data in the model means stalemate
+					winModel = new WinModel();
+					winView = new WinView({model: winModel});
+					that.$el.append(winView.render().el);
 				}
-				var winModel = new WinModel({winXO: winner.symbol});
-				var winView = new WinView({model: winModel});
-				that.$el.append(winView.render().el);
 			});
 
 			socket.on("waiting_for_player", function() {

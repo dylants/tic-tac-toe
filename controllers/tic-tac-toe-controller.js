@@ -34,7 +34,7 @@ module.exports = function(app, server) {
 
 		// called when a client clicks one of the spaces on the game board
 		socket.on("clicked", function(data) {
-			var player, game, winner;
+			var player, game, endTurnResult;
 
 			// get the game for this client
 			game = ticTacToe.findGameForPlayerID(socket.id);
@@ -54,15 +54,23 @@ module.exports = function(app, server) {
 				xo: game.currentPlayer.getXO()
 			});
 
-			// end the turn, checking to see if there's a winner
-			winner = ticTacToe.endTurn(game);
-			if (winner) {
+			// end the turn, checking the result
+			endTurnResult = ticTacToe.endTurn(game);
+			if (endTurnResult.winner) {
 				// if there's a winner, send the info to the clients
-				io.sockets.socket(game.player1.getID()).emit("winner", {
-					winner: winner
+				io.sockets.socket(game.player1.getID()).emit("end_game", {
+					winner: endTurnResult.winner
 				});
-				io.sockets.socket(game.player2.getID()).emit("winner", {
-					winner: winner
+				io.sockets.socket(game.player2.getID()).emit("end_game", {
+					winner: endTurnResult.winner
+				});
+			} else if (endTurnResult.stalemate) {
+				// if there's a stalemate, send the info to the clients
+				io.sockets.socket(game.player1.getID()).emit("end_game", {
+					stalemate: endTurnResult.stalemate
+				});
+				io.sockets.socket(game.player2.getID()).emit("end_game", {
+					stalemate: endTurnResult.stalemate
 				});
 			}
 		});

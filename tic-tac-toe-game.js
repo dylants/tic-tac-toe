@@ -164,16 +164,18 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 };
 
 /**
- * Ends the current player's turn in the supplied game. If there is a
- * winner, returns the winning information.
+ * Ends the current player's turn in the supplied game. Returns the
+ * data on the result of ending the turn.
  * 
  * @param  {Object} game The current game
- * @return {Object}      An object containing the winner's symbol (X or O)
- *                          and the winning combination as an array. If no
- *                          winner, then null.
+ * @return {Object}      An object containing the result of ending the
+ *                          turn (which could contain a winner, a
+ *                          stalemate, or nothing)
  */
 TicTacToe.prototype.endTurn = function(game) {
-	var winner;
+	var endTurnResult, winner, stalemate;
+
+	endTurnResult = {};
 
 	// check to see if there is a winner
 	winner = didSomeoneWin(game);
@@ -184,17 +186,32 @@ TicTacToe.prototype.endTurn = function(game) {
 		// both players are not ready to start a game
 		game.player1.setReadyToStartGame(false);
 		game.player2.setReadyToStartGame(false);
+
 		// return the winner data
-		return winner;
+		endTurnResult.winner = winner;
+		return endTurnResult;
 	} else {
-		// Set the current player to the other player
-		if (game.currentPlayer.isMe(game.player1.getID())) {
-			game.currentPlayer = game.player2;
+		// check to see if there's no more spaces left (stalemate)
+		stalemate = isStalemate(game);
+		if (stalemate) {
+			// both players are not ready to start a game
+			game.player1.setReadyToStartGame(false);
+			game.player2.setReadyToStartGame(false);
+
+			// return stalemate
+			endTurnResult.stalemate = stalemate;
+			return endTurnResult;
 		} else {
-			game.currentPlayer = game.player1;
+			// let's keep playin...
+			// Set the current player to the other player
+			if (game.currentPlayer.isMe(game.player1.getID())) {
+				game.currentPlayer = game.player2;
+			} else {
+				game.currentPlayer = game.player1;
+			}
+			// return empty result
+			return endTurnResult;
 		}
-		// return null (no winner)
-		return null;
 	}
 };
 
@@ -262,6 +279,22 @@ var didSomeoneWin = function(game) {
 
 	// if we're here, no winners :(
 	return null;
+};
+
+/**
+ * Returns true if all spaces are occupied
+ * @param  {Object} game The curent game
+ * @return {boolean}     True if all spaces are occupied, false otherwise
+ */
+var isStalemate = function(game) {
+	var boardKeys;
+
+	boardKeys = _.keys(game.board);
+	if (boardKeys.length >= 9) {
+		return true;
+	} else {
+		return false;
+	}
 };
 
 // Create only one instance of this game and export it

@@ -105,27 +105,28 @@ TicTacToe.prototype.moveRequest = function(game, playerID, spaceID) {
 
 	// verify it's a valid turn
 	if (game.currentPlayer.id !== player.id) {
-		console.log("not your turn!");
 		return false;
 	}
 
 	// if the space is available on the game board, allow the move
 	if (!game.board[spaceID]) {
 		game.board[spaceID] = player.xo;
-		console.log("valid move");
 		// return true to signify move was valid
 		return true;
 	} else {
 		// the space is already taken, return false
-		console.log("space is taken!");
 		return false;
 	}
 };
 
 /**
- * Ends the current player's turn in the supplied game
+ * Ends the current player's turn in the supplied game. If there is a
+ * winner, returns the winning information.
  * 
  * @param  {Object} game The current game
+ * @return {Object}      An object containing the winner's symbol (X or O)
+ *                          and the winning combination as an array. If no
+ *                          winner, then null.
  */
 TicTacToe.prototype.endTurn = function(game) {
 	var winner;
@@ -133,7 +134,7 @@ TicTacToe.prototype.endTurn = function(game) {
 	// check to see if there is a winner
 	winner = didSomeoneWin(game);
 	if (winner) {
-		console.log(winner + " WON!!!");
+		return winner;
 	} else {
 		// Set the current player to the other player
 		if (game.currentPlayer.id === game.player1.id) {
@@ -141,6 +142,8 @@ TicTacToe.prototype.endTurn = function(game) {
 		} else {
 			game.currentPlayer = game.player1;
 		}
+		// return null (no winner)
+		return null;
 	}
 };
 
@@ -163,10 +166,12 @@ var WINNING_COMBINATIONS = [
 
 /**
  * Checks if there is a winner in the current game, and if so,
- * returns the winning player's symbol (X or O).
+ * returns the winning player's information.
  * 
  * @param  {Object} game The current game
- * @return {String}      The winner (X or O) or null if no winners
+ * @return {Object}      An object containing the winner's symbol (X or O)
+ *                          and the winning combination as an array. If no
+ *                          winner, then null.
  */
 var didSomeoneWin = function(game) {
 	var board, boardKeys, intersected, i, possibleWinningCombos, winningCombo;
@@ -195,8 +200,11 @@ var didSomeoneWin = function(game) {
 			// (meaning either all X's or all O's)
 			if ((board[winningCombo[0]] === board[winningCombo[1]]) &&
 				(board[winningCombo[0]] === board[winningCombo[2]])) {
-				// there is a winner! return it
-				return board[winningCombo[0]];
+				// there is a winner! return the information
+				return {
+					symbol: board[winningCombo[0]],
+					combination: winningCombo
+				};
 			}
 		}
 	}

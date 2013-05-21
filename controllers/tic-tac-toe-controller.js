@@ -28,7 +28,7 @@ module.exports = function(app, server) {
 
 		// called when a client clicks one of the spaces on the game board
 		socket.on("clicked", function(data) {
-			var player, game;
+			var player, game, winner;
 			console.log(socket.id);
 
 			// get the game for this client
@@ -49,8 +49,11 @@ module.exports = function(app, server) {
 				xo: game.currentPlayer.xo
 			});
 
-			// and end the turn
-			ticTacToe.endTurn(game);
+			// end the turn, checking to see if there's a winner
+			winner = ticTacToe.endTurn(game);
+			if (winner) {
+				console.log(winner.symbol + " WON!!!");
+			}
 		});
 	});
 

@@ -7,15 +7,18 @@ define([
 	"jquery",
 	"space-model",
 	"space-view",
+	"status-model",
+	"status-view",
 	"win-model",
 	"win-view",
 	"text!../../templates/board.html"
 ],
-function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
-	WinView, boardHtml) {
+function (socketio, Backbone, _, $, SpaceModel, SpaceView, StatusModel,
+	StatusView, WinModel, WinView, boardHtml) {
 	"use strict";
 
 	var spaceModels = {};
+	var statusModel;
 
 	return Backbone.View.extend({
 
@@ -27,24 +30,61 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
 			var that = this;
 			var socket = socketio.connect();
 
+			this.model.on( "change", this.render, this );
+
+			// this event is thrown when we establish our connection
+			// with the server, who details who we are
 			socket.on("player_id", function(data) {
+				var statusView;
+
 				that.model.set("playerNumber", data.playerNumber);
 				that.model.set("playerXO", data.playerXO);
-				that.render();
+
+				statusModel = new StatusModel();
+				if (data.playerXO === "X") {
+					statusModel.set("otherPlayerXO", "O");
+					statusModel.set("yourTurn", true);
+				} else {
+					statusModel.set("otherPlayerXO", "X");
+					statusModel.set("yourTurn", false);
+				}
+				// to begin with, we wait...
+				statusModel.set("waiting", true);
+
+				// render our status
+				statusView = new StatusView({model: statusModel});
+				$("#status").empty();
+				$("#status").append(statusView.render().el);
 			});
 
 			socket.on("ready_to_play", function() {
+				// no longer waiting to play
+				statusModel.set("waiting", false);
+
 				// add our border lines animation
-				$("td").addClass("border-lines");
+				setTimeout(function() {
+					$("td").addClass("border-lines");
+				}, 200);
 			});
 
 			socket.on("space_claimed", function(data) {
+				// if it was your turn, it's the other player's turn
+				// now, and vice-versa
+				if (statusModel.get("yourTurn")) {
+					statusModel.set("yourTurn", false);
+				} else {
+					statusModel.set("yourTurn", true);
+				}
+
 				var model = spaceModels[data.spaceID];
 				model.set("owner", data.xo);
 			});
 
 			socket.on("end_game", function(data) {
 				var i, winner, winModel, winView;
+
+				// set the status
+				statusModel.set("gameOver", true);
 
 				winner = data.winner;
 				if (winner) {
@@ -73,7 +113,19 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, WinModel,
 				}
 
 				// remove the border lines animation
-				$("td").removeClass("border-lines");
+				setTimeout(function() {
+					$("td").removeClass("border-lines");
+				}, 200);
+
+				// reset turns
+				if (that.model.get("playerNumber") === 1) {
+					statusModel.set("yourTurn", true);
+				} else {
+					statusModel.set("yourTurn", false);
+				}
+				// back to waiting
+				statusModel.set("waiting", true);
+				statusModel.set("gameOver", false);
 			});
 		},
 

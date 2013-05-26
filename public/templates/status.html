@@ -1,0 +1,9 @@
+<% if (waiting) { %>
+	<h2>Waiting for Player to Join</h2>
+<% } else if (gameOver) { %>
+	<!-- display nothing -->
+<% } else if (yourTurn) { %>
+	<h2>Your Turn</h2>
+<% } else { %>
+	<h2><%- otherPlayerXO %>'s Turn</h2>
+<% } %>

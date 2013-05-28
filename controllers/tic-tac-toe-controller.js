@@ -28,8 +28,12 @@ module.exports = function(app, server) {
 
 		// if both players exist, we can play!
 		if (game.player1.isInUse() && game.player2.isInUse()) {
-			io.sockets.socket(game.player1.getID()).emit("ready_to_play");
-			io.sockets.socket(game.player2.getID()).emit("ready_to_play");
+			io.sockets.socket(game.player1.getID()).emit("ready_to_play", {
+				currentPlayer: game.currentPlayer.getNumber()
+			});
+			io.sockets.socket(game.player2.getID()).emit("ready_to_play", {
+				currentPlayer: game.currentPlayer.getNumber()
+			});
 		}
 
 		// called when a client clicks one of the spaces on the game board
@@ -96,8 +100,12 @@ module.exports = function(app, server) {
 			if (game.player1.isReadyToStartGame() && game.player2.isReadyToStartGame()) {
 				game = ticTacToe.newGame(game);
 				// and send the message to the clients
-				io.sockets.socket(game.player1.getID()).emit("ready_to_play");
-				io.sockets.socket(game.player2.getID()).emit("ready_to_play");
+				io.sockets.socket(game.player1.getID()).emit("ready_to_play", {
+					currentPlayer: game.currentPlayer.getNumber()
+				});
+				io.sockets.socket(game.player2.getID()).emit("ready_to_play", {
+					currentPlayer: game.currentPlayer.getNumber()
+				});
 			}
 		});
 

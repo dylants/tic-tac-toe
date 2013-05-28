@@ -57,7 +57,14 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, StatusModel,
 				$("#status").append(statusView.render().el);
 			});
 
-			socket.on("ready_to_play", function() {
+			socket.on("ready_to_play", function(data) {
+				// set who's turn it is
+				if (data.currentPlayer === that.model.get("playerNumber")) {
+					statusModel.set("yourTurn", true);
+				} else {
+					statusModel.set("yourTurn", false);
+				}
+
 				// no longer waiting to play
 				statusModel.set("waiting", false);
 
@@ -116,13 +123,6 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, StatusModel,
 				setTimeout(function() {
 					$("td").removeClass("border-lines");
 				}, 200);
-
-				// reset turns
-				if (that.model.get("playerNumber") === 1) {
-					statusModel.set("yourTurn", true);
-				} else {
-					statusModel.set("yourTurn", false);
-				}
 
 				// update the scores
 				statusModel.set("xScore", data.xScore);

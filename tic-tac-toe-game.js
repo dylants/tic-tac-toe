@@ -26,7 +26,10 @@ TicTacToe.prototype.createGame = function() {
 	game.player2 = new Player(2);
 	game.player2Score = 0;
 
-	game.currentPlayer = game.player1;
+	// when creating a game, by default, the player who has
+	// next is player 1, who will become the current player
+	game.playerWhoHasNext = game.player1;
+	game.currentPlayer = game.playerWhoHasNext;
 	game.board = {};
 
 	// add our game to our list of games
@@ -44,7 +47,8 @@ TicTacToe.prototype.createGame = function() {
  */
 TicTacToe.prototype.newGame = function(game) {
 	// reset the game, then return it back
-	game.currentPlayer = game.player1;
+	// the current player is the player who has next
+	game.currentPlayer = game.playerWhoHasNext;
 	game.board = {};
 
 	return game;
@@ -61,8 +65,10 @@ TicTacToe.prototype.removePlayerFromGame = function(game, playerID) {
 	// find which player to remove, and clear the ID
 	if (game.player1.isMe(playerID)) {
 		game.player1.clear();
+		game.playerWhoHasNext = game.player2;
 	} else {
 		game.player2.clear();
+		game.playerWhoHasNext = game.player1;
 	}
 
 	// return a new game
@@ -276,8 +282,10 @@ var didSomeoneWin = function(game) {
 				// add to their score
 				if (game.player1.getXO() === winningSymbol) {
 					game.player1Score++;
+					game.playerWhoHasNext = game.player1;
 				} else {
 					game.player2Score++;
+					game.playerWhoHasNext = game.player2;
 				}
 				// return the information
 				return {

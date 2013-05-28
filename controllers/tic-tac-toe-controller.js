@@ -86,7 +86,11 @@ module.exports = function(app, server) {
 			// set the player to ready to play
 			player.setReadyToStartGame(true);
 			// signal to the client we're waiting to get the board ready
-			io.sockets.socket(player.getID()).emit("waiting_for_player");
+			io.sockets.socket(player.getID()).emit("waiting_for_player", {
+				// we're hard coding player1 === X... is that okay?
+				xScore: game.player1Score,
+				oScore: game.player2Score
+			});
 
 			// create a new game if both players are ready
 			if (game.player1.isReadyToStartGame() && game.player2.isReadyToStartGame()) {
@@ -106,12 +110,24 @@ module.exports = function(app, server) {
 			// remove the player from the game
 			game = ticTacToe.removePlayerFromGame(game, socket.id);
 
+			// reset the scores
+			game.player1Score = 0;
+			game.player2Score = 0;
+
 			// inform the other player (if exists) that the game has reset
 			if (game.player1.isInUse()) {
-				io.sockets.socket(game.player1.getID()).emit("waiting_for_player");
+				io.sockets.socket(game.player1.getID()).emit("waiting_for_player", {
+					// we're hard coding player1 === X... is that okay?
+					xScore: game.player1Score,
+					oScore: game.player2Score
+				});
 			}
 			if (game.player2.isInUse()) {
-				io.sockets.socket(game.player2.getID()).emit("waiting_for_player");
+				io.sockets.socket(game.player2.getID()).emit("waiting_for_player", {
+					// we're hard coding player1 === X... is that okay?
+					xScore: game.player1Score,
+					oScore: game.player2Score
+				});
 			}
 		});
 	});

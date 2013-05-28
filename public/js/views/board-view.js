@@ -103,7 +103,7 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, StatusModel,
 				}
 			});
 
-			socket.on("waiting_for_player", function() {
+			socket.on("waiting_for_player", function(data) {
 				var key, model;
 
 				// loop through the space models and remove owners
@@ -123,6 +123,11 @@ function (socketio, Backbone, _, $, SpaceModel, SpaceView, StatusModel,
 				} else {
 					statusModel.set("yourTurn", false);
 				}
+
+				// update the scores
+				statusModel.set("xScore", data.xScore);
+				statusModel.set("oScore", data.oScore);
+
 				// back to waiting
 				statusModel.set("waiting", true);
 				statusModel.set("gameOver", false);

@@ -12,7 +12,9 @@ function (Backbone) {
 			waiting: true,
 			gameOver: false,
 			yourTurn: true,
-			otherPlayerXO: "O"
+			otherPlayerXO: "O",
+			xScore: 0,
+			oScore: 0
 		}
 	});
 });

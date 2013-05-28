@@ -22,7 +22,9 @@ TicTacToe.prototype.createGame = function() {
 	// create the game data
 	var game = {};
 	game.player1 = new Player(1);
+	game.player1Score = 0;
 	game.player2 = new Player(2);
+	game.player2Score = 0;
 
 	game.currentPlayer = game.player1;
 	game.board = {};
@@ -242,7 +244,8 @@ var WINNING_COMBINATIONS = [
  *                          winner, then null.
  */
 var didSomeoneWin = function(game) {
-	var board, boardKeys, intersected, i, possibleWinningCombos, winningCombo;
+	var board, boardKeys, intersected, i, possibleWinningCombos, winningCombo,
+		winningSymbol;
 
 	board = game.board;
 	boardKeys = _.keys(board);
@@ -268,9 +271,17 @@ var didSomeoneWin = function(game) {
 			// (meaning either all X's or all O's)
 			if ((board[winningCombo[0]] === board[winningCombo[1]]) &&
 				(board[winningCombo[0]] === board[winningCombo[2]])) {
-				// there is a winner! return the information
+				// there is a winner! 
+				winningSymbol = board[winningCombo[0]];
+				// add to their score
+				if (game.player1.getXO() === winningSymbol) {
+					game.player1Score++;
+				} else {
+					game.player2Score++;
+				}
+				// return the information
 				return {
-					symbol: board[winningCombo[0]],
+					symbol: winningSymbol,
 					combination: winningCombo
 				};
 			}

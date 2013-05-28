@@ -1,3 +1,4 @@
+<!-- Game Status -->
 <% if (waiting) { %>
 	<h2>Waiting for Player to Join</h2>
 <% } else if (gameOver) { %>
@@ -7,3 +8,16 @@
 <% } else { %>
 	<h2><%- otherPlayerXO %>'s Turn</h2>
 <% } %>
+
+<!-- Score -->
+<div id="score">
+	<h2>Game Score</h2>
+	<div id="x-score">
+		<div id="x-score-heading">X Wins</div>
+		<div class="player-score">0</div>
+	</div>
+	<div id="o-score">
+		<div id="o-score-heading">O Wins</div>
+		<div class="player-score">0</div>
+	</div>
+</div>

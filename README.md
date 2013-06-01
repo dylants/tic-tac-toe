@@ -18,7 +18,7 @@ is no way to choose a specific person to play against, since the server just fin
 the next available game to place the player in (which could be a new game).
 
 ## Technical Implementation Details ##
-This game provided a sandbox to test out [socket.io](http://socket.io/) in a
+This game provided a sandbox to test out [Socket.IO](http://socket.io/) in a
 Node.js application. Backbone.js is used on the client side and Node.js on the
 server side, but the interaction between the two is done purely through socket.io.
 For example, each time a user clicks a space to claim it with their symbol (X or O),
@@ -34,10 +34,14 @@ anyone has won the game after the turn is over. The tic-tac-toe-controller.js
 contains all the socket.io logic to send and receive messages to the clients, and
 uses the tic-tac-toe-game.js file to handle game logic. On the client side, the
 board-view.js handles most of the socket.io messages while it runs the game
-board.
+board.  
+
+More information on the details of the application can be found here:  
+http://blog.dylants.com/2013/05/26/socket-io/
 
 ## Getting Started ##
-If the game is hosted, you may find the URL in the GitHub description above.  
+If the game is hosted, you may find the URL in the GitHub description above.  Please be
+aware that the game may take a while to connect because of the cheap (free!) hosting.
 
 To run it locally, you'll need to install Node.js, clone the repo, and within the
 directory of the game run:  

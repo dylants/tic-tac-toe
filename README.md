@@ -41,7 +41,7 @@ http://blog.dylants.com/2013/05/26/socket-io/
 
 ## Getting Started ##
 If the game is hosted, you may find the URL in the GitHub description above.  Please be
-aware that the game may take a while to connect because of the cheap (free!) hosting.
+aware that the game may take a while to connect because of the cheap hosting.
 
 To run it locally, you'll need to install Node.js, clone the repo, and within the
 directory of the game run:  
